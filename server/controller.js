@@ -24,7 +24,7 @@ module.exports = {
                 name varchar
             );
 
-            CREATE TABLE Cities (
+            CREATE TABLE cities (
                 city_id SERIAL PRIMARY KEY,
                 name VARCHAR(30),
                 rating INTEGER,
@@ -234,28 +234,47 @@ module.exports = {
     },
     getCountries: (req, res) => {
         sequelize.query (`SELECT * FROM countries;`)
-        .then(dbRes => res.status(200).send(dbRes[0]))
-        .catch(err => console.log(err))
+
+        .then((dbRes) => {
+            res.status(200).send(dbRes[0])
+        })
+        .catch(err => console.log('error seeding db res',err))
     },
 
     createCity: (req, res) => {
-       let {country_id, name, rating} = req.body
+       let {countryId, name, rating} = req.body
 
-        sequelize.query(`INSERT INTO Cities (name, rating, country_id)
-         VALUES (${name}, ${rating}, ${country_id} REFERENCES Countries(country_id)),
-        (${name}, ${rating}, ${country_id} REFERENCES Countries(country_id))`)
-        .then(dbRes => res.status(200).send(dbRes[0]))
-        .catch(err => console.log(err))
+        sequelize.query(`INSERT INTO cities (name, rating, country_id)
+         VALUES (${name}, ${rating}, ${countryId} ;`)
+
+        .then((dbRes) => {
+            res.status(200).send(dbRes[0])
+        })
+        .catch(err => console.log('error seeding db res',err))
     },
     getCities: (req,res) => {
-        sequelize.query(`SELECT city_id, name AS city , rating`)
-        .then(dbRes => res.status(200).send(dbRes[0]))
-        .catch(err => console.log(err))
+        sequelize.query(`
+        SELECT ci.city_id, ci.name AS city ,
+        ci.rating, co.country_id, co.name AS country
+        FROM  cities ci
+        JOIN  countries co 
+        ON ci.country_id = co.country_id;`)
+
+         .then((dbRes) => {
+            res.status(200).send(dbRes[0])
+        })
+        .catch(err => console.log('error seeding db res',err))
 
     },
     deleteCity: (req, res) => {
-        sequelize.query(``)
-        .then(dbRes => res.status(200).send(dbRes[0]))
-        .catch(err => console.log(err))
+        const {id} = req.params
+        sequelize.query(`
+        DELETE FROM cities
+        WHERE city_id = ${id};`)
+
+        .then((dbRes) => {
+            res.status(200).send(dbRes[0])
+        })
+        .catch(err => console.log('error seeding db res',err))
     }
 }
